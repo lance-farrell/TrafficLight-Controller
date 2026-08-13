@@ -2,6 +2,8 @@
 
 An ARM assembly traffic-light controller for the **TM4C123GH6PM Cortex-M4** microcontroller. The project uses a finite-state machine (FSM), a 1-second SysTick interrupt, and an edge-triggered pedestrian button interrupt to control traffic LEDs and a seven-segment countdown display.
 
+Demo found: [HERE](https://www.youtube.com/watch?v=XJULkPF9oIQ)
+
 ## Features
 
 - Normal traffic cycle with timed green, yellow, and red states
