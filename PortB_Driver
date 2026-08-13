@@ -1,0 +1,70 @@
+        AREA    DATA, READWRITE
+SYSCTL_RCGCGPIO_R   EQU 0x400FE608
+GPIO_PORTB_DATA_R   EQU 0x400053FC
+GPIO_PORTB_DIR_R    EQU 0x40005400
+GPIO_PORTB_AFSEL_R  EQU 0x40005420
+GPIO_PORTB_PUR_R    EQU 0x40005510
+GPIO_PORTB_PDR_R    EQU 0x40005514
+GPIO_PORTB_DEN_R    EQU 0x4000551C
+GPIO_PORTB_LOCK_R   EQU 0x40005520
+GPIO_PORTB_CR_R     EQU 0x40005524
+GPIO_PORTB_AMSEL_R  EQU 0x40005528
+GPIO_PORTB_PCTL_R   EQU 0x4000552C
+
+        AREA    |.text|, CODE, READONLY
+        THUMB
+        EXPORT  PORTB_Init
+        EXPORT  PORTB_Output
+        EXPORT  PORTB_Input
+
+PORTB_Init
+    ; 1) Activate clock for Port B
+    LDR R1, =SYSCTL_RCGCGPIO_R
+    LDR R0, [R1]
+    ORR R0, R0, #0x02           
+    STR R0, [R1]
+    NOP
+    NOP                        
+    ; 2)
+    LDR R1, =GPIO_PORTB_LOCK_R
+    LDR R0, =0x4C4F434B        
+    STR R0, [R1]
+    LDR R1, =GPIO_PORTB_CR_R
+    MOV R0, #0xFF              
+    STR R0, [R1]
+    ; 3) Disable analog functionality
+    LDR R1, =GPIO_PORTB_AMSEL_R
+    MOV R0, #0
+    STR R0, [R1]
+    ; 4) Configure as GPIO 
+    LDR R1, =GPIO_PORTB_PCTL_R
+    MOV R0, #0
+    STR R0, [R1]
+    ; 5) Set Direction Register 
+    LDR R1, =GPIO_PORTB_DIR_R
+    MOV R0, #0xFF               ; 1 = output
+    STR R0, [R1]
+    ; 6) Regular Port Function 
+    LDR R1, =GPIO_PORTB_AFSEL_R
+    MOV R0, #0
+    STR R0, [R1]
+    ; 7) Enable Digital Port
+    LDR R1, =GPIO_PORTB_DEN_R
+    MOV R0, #0xFF               
+    STR R0, [R1]
+
+    BX  LR                     
+
+
+PORTB_Input
+    LDR R1, =GPIO_PORTB_DATA_R
+    LDR R0, [R1]
+    BX  LR
+
+PORTB_Output
+    LDR R1, =GPIO_PORTB_DATA_R
+    STR R0, [R1]              
+    BX  LR
+
+    ALIGN                       
+    END
