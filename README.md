@@ -2,7 +2,7 @@
 
 An ARM assembly traffic-light controller for the **TM4C123GH6PM Cortex-M4** microcontroller. The project uses a finite-state machine (FSM), a 1-second SysTick interrupt, and an edge-triggered pedestrian button interrupt to control traffic LEDs and a seven-segment countdown display.
 
-Demo found: [HERE](https://www.youtube.com/watch?v=XJULkPF9oIQ)
+[Watch the physical hardware demonstration](https://www.youtube.com/watch?v=XJULkPF9oIQ).
 
 ## Features
 
@@ -106,3 +106,11 @@ The controller uses labeled assembly branches for deterministic transitions betw
 Wayne State University - ECE 3620  
 May 2026
 
+
+## Verification and implementation notes
+
+This project was assembled and tested with the TM4C123GH6PM board, a breadboard, traffic LEDs, a pedestrian push button, and a seven-segment countdown display. The linked video demonstrates the physical setup. The source is kept here as the project artifact; the README describes the intended behavior and does not replace regression testing.
+
+**Code-review follow-up:** The pedestrian countdown starts at 10, but `SSD_Table` currently contains digit patterns for 0–9. In `Main.s`, `LDRB R0, [R2, R4]` uses the countdown directly as the table index, so the first lookup at 10 is outside the table. Before reusing this firmware, handle the initial 10-second value explicitly (or adjust the lookup) and re-test the display on hardware. The source code has **not** been changed here because the corrected countdown/display behavior should be validated against the original circuit.
+
+The interrupt-driven SysTick timer supplies a one-second heartbeat; the foreground FSM still polls shared flags/counters to decide when to transition between traffic states. This is an **interrupt-assisted FSM**, not a fully interrupt-only state machine.
